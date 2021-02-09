@@ -29,7 +29,7 @@ def main():
     end_point = [round(math.cos(math.radians(first_joint_angle)) * length_b, 4), round(math.sin(math.radians(first_joint_angle)) * length_b, 4)]
 
     # Calculate the total transformation of the end point
-    total_transform = [first_joint[0] + end_point[0], first_joint[1] + end_point[1]]
+    total_transform = [round(first_joint[0] + end_point[0], 4), round(first_joint[1] + end_point[1], 4)]
 
     # Print out the results of all of the math that was just done
     print("First joint position (relative to base joint): " + str(first_joint))
