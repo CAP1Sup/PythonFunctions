@@ -63,6 +63,7 @@ def main():
     print("Riemann sum calculator")
     print("Enter a valid Python expression to evaluate")
     print("Use x for the independent variable")
+    print("Expression should be in Python format. (ex equation y = x^2 + 2x + 3 should be entered as 'x**2 + 2*x + 3')")
 
     # Ask for each of the parameters
     function = input("Expression: ")
