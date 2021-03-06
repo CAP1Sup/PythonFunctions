@@ -2,7 +2,7 @@ from math import *
 import argparse
 
 # Function for getting the riemann sum of the area under a curve
-def riemann_sum(function, a, b, num_div, upper = True, midpoints = False):
+def riemann_sum(function, a, b, num_div, est_type):
     """
     str(function), float(a), float(b), int(num_div), bool(right) -> float
     Return the left/right Riemann sum of the given function with num_div divisions,
@@ -23,7 +23,7 @@ def riemann_sum(function, a, b, num_div, upper = True, midpoints = False):
     for i in range(0, num_div):
 
         # Compute the midpoints if specified
-        if midpoints:
+        if est_type == "midpts":
             height = evaluate_function(funcobj, a + (i * div_size) + div_size/2)
             rsum += height * div_size
 
@@ -31,29 +31,41 @@ def riemann_sum(function, a, b, num_div, upper = True, midpoints = False):
         else:
 
             # Evaluate lower and upper section bounds
-            lower_val = evaluate_function(funcobj, a + (i * div_size))
-            upper_val = evaluate_function(funcobj, a + ((i + 1) * div_size))
+            left_val = evaluate_function(funcobj, a + (i * div_size))
+            right_val = evaluate_function(funcobj, a + ((i + 1) * div_size))
 
             # If we're looking at upper, we want the highest value
-            if upper:
-                if (lower_val > upper_val):
-                    rsum += lower_val * div_size
+            if est_type.lower() == "upper":
+                if (left_val > right_val):
+                    rsum += left_val * div_size
                 else:
-                    rsum += upper_val * div_size
+                    rsum += right_val * div_size
 
             # If we're looking at lower, we want the lowest value
-            else:
-                if (lower_val < upper_val):
-                    rsum += lower_val * div_size
+            elif est_type.lower() == "lower":
+                if (left_val < right_val):
+                    rsum += left_val * div_size
                 else:
-                    rsum += upper_val * div_size
+                    rsum += right_val * div_size
+
+            # Left side only
+            elif est_type.lower() == "left":
+                rsum += left_val * div_size
+
+            # Right side only
+            elif est_type.lower() == "right":
+                rsum += right_val * div_size
+
+            # Throw an error if there's no type found
+            else:
+                raise ValueError("Invalid estimation type!")
 
     # Return the result, nicely rounded
     return round(rsum, 4)
 
 
 # Trapezoidal sum
-def trapezoidal_sum(function, a, b, num_div):
+def trapezoidal_sum(function, a, b, num_sectors):
 
     # Compile the function so it can be executed
     funcobj = compile(function, "Trapezoidal input formula", "eval")
@@ -62,10 +74,10 @@ def trapezoidal_sum(function, a, b, num_div):
     function_sum = 0.0
 
     # Calculate the section size
-    div_size = (b - a) / num_div
+    div_size = (b - a) / num_sectors
 
     # Calculate the sum of the y values
-    for index in range(0, num_div + 1):
+    for index in range(0, num_sectors + 1):
 
         # Add the next function values to the sum
         function_sum += 2 * evaluate_function(funcobj, a + (div_size * index))
@@ -108,16 +120,18 @@ if __name__ == "__main__":
 
         # Ask for each of the parameters
         function = input("Expression: ")
-        a = float(input("a: "))
-        b = float(input("b: "))
-        num_div = int(input("n: "))
+        a = compile(input("a: "), "a", "eval")
+        b = compile(input("b: "), "b", "eval")
+        num_div = int(input("Subintervals: "))
 
         # Calculate and print the values
-        print("Upper: " + str(riemann_sum(function, a, b, num_div, upper = True)))
-        print("Lower: " + str(riemann_sum(function, a, b, num_div, upper = False)))
-        print("Midpts: "+ str(riemann_sum(function, a, b, num_div, midpoints = True)))
+        print("Upper: " + str(riemann_sum(function, eval(a), eval(b), num_div, "upper")))
+        print("Lower: " + str(riemann_sum(function, eval(a), eval(b), num_div, "lower")))
+        print("Midpts: "+ str(riemann_sum(function, eval(a), eval(b), num_div, "midpts")))
+        print("Left: "+ str(riemann_sum(function, eval(a), eval(b), num_div, "left")))
+        print("Right: "+ str(riemann_sum(function, eval(a), eval(b), num_div, "right")))
 
-    else: 
+    else:
         # Trapezoid area estimation
 
         # Print to give the user some info
@@ -128,9 +142,9 @@ if __name__ == "__main__":
 
         # Ask for each of the parameters
         function = input("Expression: ")
-        a = float(input("a: "))
-        b = float(input("b: "))
-        num_div = int(input("n: "))
+        a = compile(input("a: "), "a", "eval")
+        b = compile(input("b: "), "b", "eval")
+        num_div = int(input("Subintervals: "))
 
         # Calculate and print the values
-        print("Trapezoidal Sum: " + str(trapezoidal_sum(function, a, b, num_div)))
+        print("Trapezoidal Sum: " + str(trapezoidal_sum(function, eval(a), eval(b), num_div)))
